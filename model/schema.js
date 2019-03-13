@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
  * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-03-11 21:15:36
+ * @Last Modified time: 2019-03-13 19:05:17
  */
 export default {
     area:{
@@ -61,7 +61,7 @@ export default {
         password:{type:String,required:true},
         avatar:{type:String},
         desc:{type:String},
-        audit_status:{type:Boolean,required:true,default:false}, // 公司审核状态,是否确认
+        audit_status:{type:String,required:true}, // 公司审核状态,是否确认
         role_id:{type:String,required:true}, // 角色id
     }
 };

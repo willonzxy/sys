@@ -27,41 +27,43 @@ Action.prototype.list = async function(ctx,next){
 }
  */
 /** action接入中间件，装载到db对象上 */
-import dbModel from '../model/dao.js';
+import dbAction from '../model/action.js';
 let extendAction = {
-    add(ctx,next){
-        this.add(ctx.body)
-        .then(() => ctx.body = {status:1,msg:'success'})
-        .catch(err => ctx.body = {status:2,msg:err})
+    async created(ctx,next){
+       /*  ctx.body = ctx.request.body */
+        await this.add(ctx.request.body)
+            .then(() => ctx.body = {status:1,msg:'success'} )
+            .catch(err => ctx.body = {status:2,msg:err})
+        
     },
-    removeById(ctx,next){
-        this.removeById(ctx.query.id)
-        .then(() => ctx.body = {status:1,msg:'success'})
-        .catch(err => ctx.body = {status:2,msg:err})
+    async removeById(ctx,next){
+        await this.removeById(ctx.query.id)
+        .then(() =>ctx.body = {status:1,msg:'success'})
+        .catch(err => ctx.body = {status:2,msg:err} )
     },
-    list(ctx,next){
-        console.log(this)
-        let search = ctx.query;
-        this.list(search)
+    async select(ctx,next){
+        let query = ctx.query;
+        if(!Object.keys(query).length){
+            ctx.body = {status:2,msg:'query must required'}
+        }
+        await this.list(query)
         .then(data => ctx.body = {status:1,msg:'success',data})
         .catch(err => ctx.body = {status:2,msg:err})
     }
 }
 
-async function Action(name,schema,service = {}){
-    let action = dbModel(db,name,schema);
-    action = { ...action , ...extendAction, ...service }
-    console.log('userAction对象......')
-    console.log(action) 
-    return async function(ctx,next){
-        if( typeof ctx.service === 'object' ){
-            ctx.service[name] = action;
-        }else{
-            ctx.service = {};
-            ctx.service[name] = action;
+function Action(db,name,schema,service = {}){
+    let dbM = dbAction(db,name,schema),temp = { ...extendAction, ...service };
+    for(let key in temp){
+        if(!dbM.hasOwnProperty(key)){
+            if(typeof temp[key] === 'function'){
+                dbM[key] = temp[key].bind(dbM)
+            }else{
+                dbM[key] = temp[key]
+            }
         }
-        await next()
     }
+    return dbM
 }
 
 export default Action

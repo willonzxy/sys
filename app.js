@@ -1,36 +1,37 @@
 import Koa from 'koa'
 import Router from 'koa-trie-router'
-import dbc from './middleware/dbc.js'
-import Action from './middleware/baseAction.js'
+import koaBody from 'koa-body'
+import path from 'path'
+import NDBC from './middleware/ndbc.js'
+import Service from './middleware/service.js'
 import Schema from './model/schema.js'
 let app = new Koa(),router = new Router(),{ user } = Schema;
-
-app.use(dbc) // 桥接数据库实例对象
-/* console.log(Action(app.context.db,'user',user))
-app.use(Action(app.context.db,'user',user))    // 用ctx.db实例化异步操作对象 */
-
-router.get('/user',ctx=>{
-    ctx.body = {msg:'success'}
-})
-
-app.use(router.middleware())
-
-app.listen(3000,()=>{
-    console.log('server running......')
-})
-
-/* (async function(){
+app.use(koaBody({
+    multipart:true, // 支持文件上传
+    encoding:'gzip',
+    formidable:{
+      uploadDir:path.join(__dirname,'public/upload/'), // 设置文件上传目录
+      keepExtensions: true,    // 保持文件的后缀
+      maxFieldsSize:2 * 1024 * 1024, // 文件上传大小
+      onFileBegin:(name,file) => { // 文件上传前的设置
+        // console.log(`name: ${name}`);
+        // console.log(file);
+      },
+    }
+  }));
+(async ()=>{
     try {
-        let userAction = await new Action('user',user);
-        console.log(userAction.__proto__.list)
-        router.get('/user',userAction.list).post('/user',userAction.add).delete('/user',userAction.removeById)
-        app.use(router.middleware())
-        app.listen(3000,()=>{
-            console.log('服务器启动成功')
-        })
+        const ndbc = await NDBC();
+        const UserService = Service(ndbc,'user',user);
+            app.context.ndbc = ndbc;
+            app.context.service = {};
+            app.context.service.user = UserService;
+            router.get('/user',UserService.select).post('/user',UserService.created)
+            app.use(router.middleware())
+            app.listen(3000,()=>{
+                console.log('server running......')
+            })
     } catch (error) {
         console.log(error)
-        console.log('服务器启动失败')
     }
 })()
-     */

@@ -2,18 +2,18 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-11 16:23:45 
  * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-03-12 15:02:09
+ * @Last Modified time: 2019-03-13 18:49:34
  */
 import Mongoose from "mongoose"
 /* import dbConnect from "../db/connect.js" */
 
 export default function (db,name,scheme){
     /** 映射实体*/
-    let MsgSchema = new Mongoose.Schema(scheme);
+    let Schema = new Mongoose.Schema(scheme);
 
     let modelName = name;
 
-    MsgSchema.statics = {
+    Schema.statics = {
         /**
          * 根据_id删除消息信息
          * @param {String} id 
@@ -56,7 +56,7 @@ export default function (db,name,scheme){
          * 分页请求获取消息信息
          * @param {obj} query 
          */
-        list(query){                //返回一个Promise 对象
+        list(query = {}){                //返回一个Promise 对象
             query.pageNum = query.pageNum?~~query.pageNum-1:0;
             query.pageSize = query.pageSize?~~query.pageSize:10;
             query.sortBy = query.sortBy?query.sortBy:'date';
@@ -81,7 +81,7 @@ export default function (db,name,scheme){
             });
             return f.then(
                 (result) => new Promise((resolve,reject)=>{
-                    that.model(modelName).count(query.filter,(err,num)=>{
+                    that.model(modelName).estimatedDocumentCount(query.filter,(err,num)=>{
                         if(err){
                             reject('获取数据总数失败');
                         }else{
@@ -99,6 +99,8 @@ export default function (db,name,scheme){
          * @param {obj} obj 
          */
         add(obj){
+            console.log('adasdasdnnnn')
+            console.log(obj)
             let that = this;
             return new Promise((resolve,reject)=>{
                 that.model(modelName).create(obj,err=>{
@@ -113,5 +115,5 @@ export default function (db,name,scheme){
         }
     }
 
-    return db.model(modelName,scheme);
+    return db.model(modelName,Schema);
 }
