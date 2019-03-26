@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
  * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-03-13 19:05:17
+ * @Last Modified time: 2019-03-20 10:29:37
  */
 export default {
     area:{
@@ -16,6 +16,8 @@ export default {
     },
     company:{
         company_name:{type:String,default:'未填写',required:true},
+        leader:{type:String,default:'未填写',required:true},
+        license:{type:String,default:'未上传',required:true},
         site:{type:String,required:true}, // 公司的位置
         tel:{type:String,required:true}, // 公司负责人电话
         date:{type:Number,required:true}, // 创建监控申请的时间
