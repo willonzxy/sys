@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
  * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-03-20 10:29:37
+ * @Last Modified time: 2019-03-29 10:11:56
  */
 export default {
     area:{
@@ -27,7 +27,7 @@ export default {
     msg:{
         company_id:{type:String,required:true},
         params:{type:Array,required:true,default:[]},
-        /*
+        /*   
         params的示例
         var params = {
             name1:{
