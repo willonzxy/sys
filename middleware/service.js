@@ -31,7 +31,6 @@ import dbAction from '../model/action.js';
 let extendAction = {
     async created(ctx,next){
        /*  ctx.body = ctx.request.body */
-       console.log(ctx.request.body)
         await this.add(ctx.request.body)
             .then(() => ctx.body = {status:1,msg:'success'} )
             .catch(err => ctx.body = {status:2,msg:err})
@@ -49,6 +48,12 @@ let extendAction = {
         }
         await this.list(query)
         .then(data => ctx.body = {status:1,msg:'success',data})
+        .catch(err => ctx.body = {status:2,msg:err})
+    },
+    async find_one(ctx,next){
+        console.log(ctx.request.body)
+        await this._findOne(ctx.request.body)
+        .then(() => ctx.body = {status:1,msg:'success'} )
         .catch(err => ctx.body = {status:2,msg:err})
     }
 }

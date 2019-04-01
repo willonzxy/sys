@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
  * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-03-29 10:11:56
+ * @Last Modified time: 2019-04-01 15:27:45
  */
 export default {
     area:{
@@ -18,10 +18,11 @@ export default {
         company_name:{type:String,default:'未填写',required:true},
         leader:{type:String,default:'未填写',required:true},
         license:{type:String,default:'未上传',required:true},
+        password:{type:String,required:true},
         site:{type:String,required:true}, // 公司的位置
         tel:{type:String,required:true}, // 公司负责人电话
         date:{type:Number,required:true}, // 创建监控申请的时间
-        deadline:{type:Number,required:true}, // 平台使用截止日期
+        deadline:{type:Number}, // 平台使用截止日期
         status:{type:Number,required:true}, // active ，平台使用已过有效期timeout
     },
     msg:{

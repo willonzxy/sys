@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-11 16:23:45 
  * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-03-29 14:00:25
+ * @Last Modified time: 2019-04-01 14:39:37
  */
 import Mongoose from "mongoose"
 /* import dbConnect from "../db/connect.js" */
@@ -105,6 +105,19 @@ export default function (db,name,scheme){
                     if(err){
                         console.log(err);
                         reject({status:2,msg:'保存信息失败'});
+                    }else{
+                        resolve();
+                    }
+                })
+            })
+        },
+        _findOne(obj){
+            let that = this;
+            return new Promise((resolve,reject)=>{
+                that.model(modelName).findOne(obj,err=>{
+                    if(err){
+                        console.log(err);
+                        reject({status:2,msg:'不存在该信息'});
                     }else{
                         resolve();
                     }

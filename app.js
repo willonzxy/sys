@@ -6,18 +6,31 @@ import NDBC from './middleware/ndbc.js'
 import Service from './middleware/service.js'
 import Schema from './model/schema.js'
 import UploadService from './service/upload/index.js'
+import {companyRegister} from './service/proxy/companyProxy.js'
+import cors from 'koa2-cors'
 let app = new Koa(),router = new Router(),{ user,msg,company,area,sensor } = Schema;
+app.use(cors())
 app.use(koaBody({
-    multipart:true, // 支持文件上传
-    encoding:'gzip',
+    multipart:true,
+    // encoding:'gzip', 开启这个会使其他上传请求415 贼坑
     formidable:{
-        uploadDir:path.join(__dirname,'public/upload/'), // 设置文件上传目录
-        keepExtensions: true,    // 保持文件的后缀
-        maxFieldsSize:2 * 1024 * 1024, // 文件上传大小
-        onFileBegin:(name,file) => { // 文件上传前的设置
-        // console.log(`name: ${name}`);
-        // console.log(file);
-        },
+      uploadDir:path.join(__dirname,'public/upload'),
+      keepExtensions: true,
+      maxFieldsSize:2 * 1024 * 1024,
+      onFileBegin:(name,file) => {
+        /* // console.log(file);
+        // 获取文件后缀
+        const ext =getUploadFileExt(file.name);
+        // 最终要保存到的文件夹目录
+        const dir = path.join(__dirname,`public/upload/${getUploadDirName()}`);
+        // 检查文件夹是否存在如果不存在则新建文件夹
+        checkDirExist(dir);
+        // 重新覆盖 file.path 属性
+        file.path = `${dir}/${getUploadFileName(ext)}`; */
+      },
+      onError:(err)=>{
+        console.log(err);
+      }
     }
 }));
 (async () => {
@@ -37,7 +50,9 @@ app.use(koaBody({
             app.context.service.sensor = SensorService;
             router.get('/user',UserService.select).post('/user',UserService.created)
             router.get('/msg',MsgService.select).post('/msg',MsgService.created)
-            router.get('/company',CompanyService.select).post('/company',CompanyService.created)
+            router.get('/company',CompanyService.select)
+            .post('/company/register',companyRegister,CompanyService.created)
+            .post('/company/login',CompanyService.find_one)
             router.get('/area',AreaService.select).post('/area',AreaService.created)
             router.get('/sensor',SensorService.select).post('/sensor',SensorService.created)
             router.post('/upload',UploadService)
