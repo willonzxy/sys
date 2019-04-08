@@ -1,18 +1,20 @@
 /*
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
- * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-04-01 15:27:45
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2019-04-07 11:12:53
  */
 export default {
     area:{
-        company_id:{type:String,default:'未填写',required:true}, //公司id
+        company_id:{type:String,default:'未填写'}, //公司id 必填
         area_name:{type:String,default:'未填写',required:true},
-        sensor_list:{type:Array,default:[]}, //该区域下传感器的类型 [{type:'name',dev_list:[{did:'',status:'active'}},{did:'',status:''}]}]
-        subnet_ip:{type:String,required:true}, // 一个区域子网ip,对应一个上报终端设备
-        date:{type:Number,required:true},
-        modified_date:{type:Number,required:true},
-        modifier:{type:String,required:true},
+        sensor_list:{type:Array,default:[]}, //4-7拟定只有sensor_name 该区域下传感器的类型 [{type:'name',dev_list:[{did:'',status:'active'}},{did:'',status:''}]}]
+        // subnet_ip:{type:String,required:true}, // 一个区域子网ip,对应一个上报终端设备
+        desc:{type:String},
+        pic:{type:String},
+        date:{type:Number,default:Date.now()},  // 必填
+        modified_date:{type:Number,default:Date.now()},
+        modifier:{type:String}, // 必填
     },
     company:{
         company_name:{type:String,default:'未填写',required:true},
@@ -47,13 +49,13 @@ export default {
             },
         }*/
     },
-    sensor:{
+    warehouse:{
         company_id:{type:String,required:true,default:'未填写'},
         type:{type:String,required:true,default:'未填写'},
         desc:{type:String,default:'未填写'},
         inventory:{type:Number,default:0}, // 库存
         used:{type:Number,default:0},
-        date:{type:Number,required:true},
+        date:{type:Number,default:Date.now()},
         pic:{type:String}, // 传感器图片
         params:{type:Array,default:[]} // [{name:'',unit:'°C'}] 参数的单位与名称
     },

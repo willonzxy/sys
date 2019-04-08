@@ -36,8 +36,8 @@ let extendAction = {
             .catch(err => ctx.body = {status:2,msg:err})
         
     },
-    async removeById(ctx,next){
-        await this.removeById(ctx.query.id)
+    async del(ctx,next){
+        await this.removeById(ctx.params.id)
         .then(() => ctx.body = {status:1,msg:'success'})
         .catch(err => ctx.body = {status:2,msg:err} )
     },
