@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-20 10:55:52 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2019-04-08 21:54:26
+ * @Last Modified time: 2019-04-14 23:18:00
  */
 /* 上传文件服务支持,最后返回存放地址,最好如果有时间，可以加一个鉴权 */
 const fs = require('fs');
@@ -10,7 +10,8 @@ const path = require('path');
 const scene_list = [
     'licence',
     'area',
-    'warehouse'
+    'warehouse',
+    'user'
 ]
 
 export default async function(ctx,next){

@@ -41,19 +41,39 @@ let extendAction = {
         .then(() => ctx.body = {status:1,msg:'success'})
         .catch(err => ctx.body = {status:2,msg:err} )
     },
+    async put(ctx,next){
+        if(!ctx.params.id){
+            ctx.body = { status:2,msg:'id params required' }
+        }
+        if(!ctx.request.body){
+            ctx.body = { status:2,msg:'body params required' }
+        }
+        let query = ctx.query;
+        query = Object.keys(query).length > 0 ?  {...query,_id:ctx.params.id} : {_id:ctx.params.id};
+        await this.updateInfo(query,ctx.request.body)
+        .then(() => ctx.body = {status:1,msg:'success'})
+        .catch(err => ctx.body = {status:2,msg:err} )
+    },
+    async patch(ctx,next){
+        if(!ctx.params.id){
+            ctx.body = { status:2,msg:'id params required' }
+        }
+        if(!ctx.request.body){
+            ctx.body = { status:2,msg:'body params required' }
+        }
+        let query = ctx.query;
+        query = Object.keys(query).length > 0 ?  {...query,_id:ctx.params.id} : {_id:ctx.params.id};
+        await this.updateInfo(query,ctx.request.body)
+        .then(() => ctx.body = {status:1,msg:'success'})
+        .catch(err => ctx.body = {status:2,msg:err} )
+    },
     async select(ctx,next){
         let query = ctx.query;
-        if(!Object.keys(query).length){
+        if(!Object.keys(query).length){ // 取保password这个字段不对外吐出
             ctx.body = {status:2,msg:'query must required'}
         }
-        await this.list(query)
+        await this.list(query,{password:false})
         .then(data => ctx.body = {status:1,msg:'success',data})
-        .catch(err => ctx.body = {status:2,msg:err})
-    },
-    async find_one(ctx,next){
-        console.log(ctx.request.body)
-        await this._findOne(ctx.request.body)
-        .then(() => ctx.body = {status:1,msg:'success'} )
         .catch(err => ctx.body = {status:2,msg:err})
     }
 }

@@ -1,0 +1,64 @@
+import CONFIG from '../config/config.json'
+const domain_path = (url='') => CONFIG.domain_path+url
+const super_domain_path = (url='') => CONFIG.super_domain_path+url
+/** 前端路由映射 */
+export default {
+    domain:{
+        area:{
+            to:domain_path('/area'),
+            icon:'area-chart',
+            key:1,
+            label:'区域监控',
+        },
+        warehouse:{
+            to:domain_path('/warehouse'),
+            icon:'inbox',
+            key:2,
+            label:'仓储管理',
+        },
+        warnsetting:{
+            to:domain_path('/warnsetting'),
+            icon:'warning',
+            key:3,
+            label:'预警配置',
+        },
+        user:{
+            to:domain_path('/userctrl'),
+            icon:'inbox',
+            key:4,
+            label:'人员管理',
+        },
+        role:{
+            to:domain_path('/rolectrl'),
+            icon:'inbox',
+            key:5,
+            label:'角色管理',
+        },
+        msg:{
+            to:domain_path('/msg'),
+            icon:'inbox',
+            key:6,
+            label:'数据阅览',
+        }
+    },
+    super_domain:{
+        power:{
+            to:super_domain_path('/powerctrl'),
+            icon:'inbox',
+            key:1,
+            label:'权限管理',
+        },
+        dir:{
+            to:super_domain_path('/dir'),
+            icon:'inbox',
+            key:2,
+            label:'字典管理',
+        },
+        company:{
+            to:super_domain_path('/company'),
+            icon:'inbox',
+            key:3,
+            label:'公司管理',
+        }
+    }
+}

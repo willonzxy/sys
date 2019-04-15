@@ -7,11 +7,30 @@ import NDBC from './middleware/ndbc.js'
 import Service from './middleware/service.js'
 import Schema from './model/schema.js'
 import UploadService from './service/upload/index.js'
-import {companyRegister} from './service/proxy/companyProxy.js'
+import {
+      companyRegister,warnConfigCreated,translate,
+      roleCreatedProxy,tableDataSet,userCreatedProxy,
+      dirCreateProxy,areaCreateProxy,
+      getMenu,
+      checkLogin
+} from './service/proxy/loggicProxy.js'
 import cors from 'koa2-cors'
-let app = new Koa(),router = new Router(),{ user,msg,company,area,warehouse } = Schema;
+import fs from 'fs'
+import session from 'koa-session'
+let app = new Koa(),router = new Router(),{ user,msg,company,area,warehouse,warnsetting,dir,power,role} = Schema;
 app.use(staticServer(path.resolve(__dirname,'./public')))
-app.use(cors())
+//app.use(cors())
+app.keys = ['some secret hurr'];
+const CONFIG = {
+   key: 'koa:sess',   //cookie key (default is koa:sess)
+   maxAge: 86400000,  // cookie的过期时间 maxAge in ms (default is 1 days)
+   overwrite: true,  //是否可以overwrite    (默认default true)
+   httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
+   signed: true,   //签名默认true
+   rolling: false,  //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
+   renew: false,  //(boolean) renew session when session is nearly expired,
+};
+app.use(session(CONFIG, app));
 
 app.use(koaBody({
     multipart:true,
@@ -44,36 +63,90 @@ app.use(koaBody({
             MsgService = Service(ndbc,'msg',msg),
             CompanyService = Service(ndbc,'company',company),
             AreaService = Service(ndbc,'area',area),
-            WarehouseService = Service(ndbc,'warehouse',warehouse);
+            WarehouseService = Service(ndbc,'warehouse',warehouse),
+            WarnConfigService = Service(ndbc,'warnsetting',warnsetting),
+            PowerCtrlService = Service(ndbc,'power',power),
+            RoleCtrlService = Service(ndbc,'role',role),
+            DirService = Service(ndbc,'dir',dir);
+            
             app.context.ndbc = ndbc;
             app.context.service = {};
-            app.context.service.user = UserService;
-            app.context.service.msg = MsgService;
+            // app.context.service.user = UserService;
+            // app.context.service.msg = MsgService;
             app.context.service.company = CompanyService;
-            app.context.service.area = AreaService;
-            app.context.service.warehouse = WarehouseService;
-            /**  */
-            router.get('/user',UserService.select)
-                  .post('/user',UserService.created)
+            // app.context.service.area = AreaService;
+            // app.context.service.warehouse = WarehouseService;
+            // app.context.service.warnconfig = WarnConfigService;
+            app.context.service.dir = DirService
+            app.context.service.role = RoleCtrlService
+            
+
             /** 信息数据 */
             router.get('/msg',MsgService.select)
                   .post('/msg',MsgService.created)
             /** 公司 */
             router.get('/company',CompanyService.select)
                   .post('/company/register',companyRegister,CompanyService.created)
-                  .post('/company/login',CompanyService.find_one)
+                  .post('/company/login',checkLogin)
             /** 区域 */
             router.get('/area',AreaService.select)
-                  .post('/area',AreaService.created)
+                  .post('/area',areaCreateProxy,AreaService.created)
                   .del('/area/:id',AreaService.del)
+                  .put('/area/:id',AreaService.put)
             /** 存储管理 */
             router.get('/warehouse',WarehouseService.select)
                   .get('/warehouse/selectbyname',WarehouseService.select)
                   .post('/warehouse',WarehouseService.created)
                   .del('/warehouse/:id',WarehouseService.del)
-
             /** 统一图片上传接口 */
             router.post('/upload',UploadService)
+            /** 预警配置 */
+            router.get('/warnconfig',WarnConfigService.select)
+                  .post('/warnconfig',warnConfigCreated,WarnConfigService.created)
+                  .del('/warnconfig/:id',WarnConfigService.del)
+                  .patch('/warnconfig/:id',WarnConfigService.patch)
+                  .put('/warnconfig/:id',warnConfigCreated,WarnConfigService.put)
+            /** 字典管理 */
+            router.get('/dir',DirService.select)
+                  .post('/dir',dirCreateProxy,DirService.created)
+                  .del('/dir/:id',DirService.del)
+                  .patch('/dir/:id',DirService.patch)
+                  .put('/dir/:id',DirService.put)
+            
+            /** 人员管理 */
+            router.get('/user',UserService.select)
+                  .post('/user',userCreatedProxy,UserService.created)
+                  .del('/user/:id',UserService.del)
+                  .patch('/user/:id',UserService.patch)
+                  .put('/user/:id',UserService.put)
+
+            /** 权限管理 */
+            router.get('/power',PowerCtrlService.select)
+                  .post('/power',translate,PowerCtrlService.created)
+                  .del('/power/:id',PowerCtrlService.del)
+                  .patch('/power/:id',PowerCtrlService.patch)
+                  .put('/power/:id',PowerCtrlService.put)
+
+            /** 角色管理 */
+            router.get('/role',RoleCtrlService.select)
+                  .post('/role',roleCreatedProxy,RoleCtrlService.created)
+                  .del('/role/:id',RoleCtrlService.del)
+                  .patch('/role/:id',RoleCtrlService.patch)
+                  .put('/role/:id',RoleCtrlService.put)
+
+            router.get('/ownmenu',getMenu)
+
+            /** 数据表格权限 */
+            router.get('/tabledataset',tableDataSet)
+            /** 文件导出 */
+            router.get('/download',async ctx=>{
+              let file = await new Promise(resolve=>{
+                fs.readFile(path.resolve(__dirname,'./package.json'),(err,buffer)=>{
+                  resolve(buffer)
+                })
+              })
+              ctx.body = file
+            })
             app.use(router.routes())
             app.listen(4000,()=>{
                 console.log('server running......')
