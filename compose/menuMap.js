@@ -42,6 +42,18 @@ export default {
         }
     },
     super_domain:{
+        company:{
+            to:super_domain_path('/company'),
+            icon:'inbox',
+            key:3,
+            label:'公司管理',
+        },
+        role:{
+            to:super_domain_path('/rolectrl'),
+            icon:'inbox',
+            key:4,
+            label:'角色管理',
+        },
         power:{
             to:super_domain_path('/powerctrl'),
             icon:'inbox',
@@ -54,11 +66,5 @@ export default {
             key:2,
             label:'字典管理',
         },
-        company:{
-            to:super_domain_path('/company'),
-            icon:'inbox',
-            key:3,
-            label:'公司管理',
-        }
     }
 }

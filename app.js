@@ -12,7 +12,8 @@ import {
       roleCreatedProxy,tableDataSet,userCreatedProxy,
       dirCreateProxy,areaCreateProxy,
       getMenu,
-      checkLogin
+      checkLogin,
+      roleSelectProxy
 } from './service/proxy/loggicProxy.js'
 import cors from 'koa2-cors'
 import fs from 'fs'
@@ -71,7 +72,8 @@ app.use(koaBody({
             
             app.context.ndbc = ndbc;
             app.context.service = {};
-            // app.context.service.user = UserService;
+            app.context.service.user = UserService;
+            app.context.service.power = PowerCtrlService;
             // app.context.service.msg = MsgService;
             app.context.service.company = CompanyService;
             // app.context.service.area = AreaService;
@@ -86,8 +88,11 @@ app.use(koaBody({
                   .post('/msg',MsgService.created)
             /** 公司 */
             router.get('/company',CompanyService.select)
-                  .post('/company/register',companyRegister,CompanyService.created)
+                  .post('/company',companyRegister,CompanyService.created)
                   .post('/company/login',checkLogin)
+                  .put('/company/:id',CompanyService.put)
+                  .patch('/company/:id',CompanyService.patch)
+                  .del('/company/:id',CompanyService.del)
             /** 区域 */
             router.get('/area',AreaService.select)
                   .post('/area',areaCreateProxy,AreaService.created)
@@ -128,13 +133,22 @@ app.use(koaBody({
                   .put('/power/:id',PowerCtrlService.put)
 
             /** 角色管理 */
-            router.get('/role',RoleCtrlService.select)
+            router.get('/role',roleSelectProxy,RoleCtrlService.select)
                   .post('/role',roleCreatedProxy,RoleCtrlService.created)
                   .del('/role/:id',RoleCtrlService.del)
                   .patch('/role/:id',RoleCtrlService.patch)
                   .put('/role/:id',RoleCtrlService.put)
 
             router.get('/ownmenu',getMenu)
+
+            router.get('/session',async ctx=>{
+                  if(ctx.session){
+                        ctx.body = {status:1,session:ctx.session,msg:'login'}
+                  }else{
+                        ctx.body = {status:2,msg:'no login'}
+                  }
+                  
+            })
 
             /** 数据表格权限 */
             router.get('/tabledataset',tableDataSet)

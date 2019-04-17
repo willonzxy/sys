@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2019-04-16 03:16:05
+ * @Last Modified time: 2019-04-17 16:22:40
  */
 export default {
     area:{
@@ -28,13 +28,14 @@ export default {
         company_status:{type:Number,default:0}, // active ，平台使用已过有效期timeout
         power_list:{type:Array,default:[]}, // [power_id}]
         table_data_list:{type:Array,default:[]},// [{colletion_id
+        company_role:{type:Array,default:[]} // 可以有承担多个角色
     },
     msg:{
         msg_company_id:{type:String,required:true},
         area_id:{type:String,required:true},
         ts:{type:Number,required:true},
         params:{type:Array,required:true,default:[]},
-        /*   
+        /*
         params的示例
         var params = {
             name1:{
@@ -90,14 +91,16 @@ export default {
         user_desc:{type:String},
         user_status:{type:Number,required:true,default:0}, // 公司审核状态,是否确认
         role_id:{type:String,required:true,default:''}, // 角色id
-        user_role_name:{type:String,required:true}
+        user_role_name:{type:String,required:true},
+        role:{type:Array,default:[]} // 管理员标识
     },
     role:{
         role_name:{type:String,required:true},
         role_level:{type:Number,required:true,default:0},
         power_list:{type:Array,default:[]}, // [power_id}]
-        table_data_list:{type:Array,default:[]},// [{colletion_id:d_id,list:['']}]
-        role_desc:{type:String}
+        table_data_list:{type:Array,default:[]},// ['']
+        role_desc:{type:String},
+        role_scene:{type:String,required:true}, // 通过session跟踪添加的场景
     },
     power:{
         power_name:{type:String,required:true},
