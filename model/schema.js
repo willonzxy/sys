@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2019-04-17 16:22:40
+ * @Last Modified time: 2019-04-18 00:59:13
  */
 export default {
     area:{
@@ -80,7 +80,8 @@ export default {
         warnconfig_status:{type:String}, // 默认关闭该预警
         warnconfig_created_date:{type:String},
         warnconfig_modifier:{type:String},
-        warnconfig_modified_date:{type:Number}
+        warnconfig_modified_date:{type:Number},
+        receive:{type:String,required:true}, // 接收人
     },
     user:{
         user_company_id:{type:String,required:true},

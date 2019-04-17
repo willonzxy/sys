@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-20 10:11:44 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2019-04-17 17:49:25
+ * @Last Modified time: 2019-04-18 01:32:06
  */
 import Schema from '../../model/schema.js'
 import Config from '../../config/config.json'
@@ -49,13 +49,14 @@ const userCreatedProxy = async function(ctx,next){
     let role_list = await ctx.service.role.list({_id:ctx.request.body.role_id})
     let role_name = role_list.list[0].role_name;
     ctx.request.body.user_role_name = role_name;
+    ctx.request.body.company_id = ctx.session.user.user_company_id || ctx.session.user._id;
     await next()
 }
 
 const dirCreateProxy = async function(ctx,next){
     let { p_id } = ctx.request.body;
     if(p_id){
-        let list = await ctx.service.dir.list({_id:p_id});
+        let list = await ctx.service.dir.list({d_id:p_id});
         let name = list.list[0].dir_name;
         ctx.request.body.p_name = name;
         ctx.request.body.p_id = list.list[0].d_id
@@ -69,7 +70,7 @@ const dirCreateProxy = async function(ctx,next){
 
 const areaCreateProxy = async function(ctx,next){
     let { sensor_list } = ctx.request.body;
-    let list = await ctx.service.dir.list({p_id:'W'});
+    let list = await ctx.service.dir.list({p_id:'W',pageSize:10000});
     sensor_list.map(i=>{
         return list.list.filter(item=>item.d_id === i)[0].dir_name
     })
@@ -118,7 +119,7 @@ const checkLogin =  async (ctx,next)=>{
 }
 
 const tableDataSet = async (ctx,next) =>{
-    let keys = await ctx.service.dir.list({p_id:'C'});
+    let keys = await ctx.service.dir.list({p_id:'C',pageSize:10000});
     let arr = [];
     keys.list && keys.list.forEach(item=>{
         let ks = Object.keys(Schema[item.d_id]),temp = [],allValue = [];
@@ -165,27 +166,33 @@ const getMenu = async (ctx,next)=>{
                     _id:company_role[len],
                     role_scene:'super_domain'
                 })
+                if(!temp.list.length){
+                    continue
+                }
                 power_list.push(temp.list[0].power_list)
                 table_data_list.push(temp.list[0].table_data_list)
             }
             table_data_list = table_data_list.toString().split(','); // 展平
             power_list = power_list.toString().split(','); // 展平
-            console.log(power_list)
             for(let i = power_list.length;i--;){ // 通过power_id -> power 的详情
                 let temp = await ctx.service.power.list({
                     _id:power_list[i]
                 })
+                if(!temp.list.length){
+                    continue
+                }
                 powers.push(temp.list[0])
             }
             console.log(powers)
         
             powers.forEach(item=>{
-                let c = item.collection_id; // 集合名称
+                let c = item.collection_id; // 组织集合名称与其动作
                 if(collections.includes(c)){
                     data[c].actions.push(item.action_id)
                 }else{
                     data[c] = {}
                     data[c].actions = [item.action_id]
+                    collections.push(c)
                 }
             })
             console.log(data)
@@ -203,6 +210,9 @@ const getMenu = async (ctx,next)=>{
                     _id:role[len],
                     role_scene:'domain'
                 })
+                if(!temp.list.length){
+                    continue
+                }
                 power_list.push(temp.list[0].power_list)
                 table_data_list.push(temp.list[0].table_data_list)
             }
@@ -213,6 +223,9 @@ const getMenu = async (ctx,next)=>{
                 let temp = await ctx.service.power.list({
                     _id:power_list[i]
                 })
+                if(!temp.list.length){
+                    continue
+                }
                 powers.push(temp.list[0])
             }
             powers.forEach(item=>{
