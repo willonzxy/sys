@@ -1,8 +1,8 @@
 /*
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-20 10:11:44 
- * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2019-04-18 01:32:06
+ * @Last Modified by: 伟龙
+ * @Last Modified time: 2019-04-18 18:58:29
  */
 import Schema from '../../model/schema.js'
 import Config from '../../config/config.json'
@@ -28,7 +28,7 @@ const translate = async function(ctx,next){
     // 用d_id翻译出name
     let collection_name = await ctx.service.dir.list({d_id:collection_id})
     let action = await ctx.service.dir.list({d_id:action_id})
-    console.log(collection_name,action)
+    //console.log(collection_name,action)
     ctx.request.body = {...ctx.request.body,collection_name:collection_name.list[0].dir_name,action:action.list[0].dir_name}
     await next()
 }
@@ -70,12 +70,12 @@ const dirCreateProxy = async function(ctx,next){
 
 const areaCreateProxy = async function(ctx,next){
     let { sensor_list } = ctx.request.body;
-    let list = await ctx.service.dir.list({p_id:'W',pageSize:10000});
+    let list = await ctx.service.dir.list({p_id:'S',pageSize:10000});
     sensor_list.map(i=>{
         return list.list.filter(item=>item.d_id === i)[0].dir_name
     })
     ctx.request.body.sensor_list
-    console.log(ctx.request.body.sensor_list)
+    //console.log(ctx.request.body.sensor_list)
     await next()
 }
 
@@ -151,7 +151,7 @@ const getMenu = async (ctx,next)=>{
         // 从session 获取 role
         const role = ctx.session.role || 'domain'
         // 加载原始菜单
-        console.log(role)
+        //console.log(role)
         role === 'common' && ( role = 'domain' );
         const allMenu = MenuMap[role]; // 默认全部输出再过滤
         //delete allMenu.msg // 测试删除数据阅览功能
@@ -183,7 +183,7 @@ const getMenu = async (ctx,next)=>{
                 }
                 powers.push(temp.list[0])
             }
-            console.log(powers)
+            //console.log(powers)
         
             powers.forEach(item=>{
                 let c = item.collection_id; // 组织集合名称与其动作
@@ -195,7 +195,7 @@ const getMenu = async (ctx,next)=>{
                     collections.push(c)
                 }
             })
-            console.log(data)
+           // console.log(data)
            
             ctx.body = {
                 status:1,
