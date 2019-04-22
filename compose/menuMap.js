@@ -1,67 +1,104 @@
 import CONFIG from '../config/config.json'
-const domain_path = (url='') => CONFIG.domain_path+url
-const super_domain_path = (url='') => CONFIG.super_domain_path+url
+const resolvePath = (url='') => CONFIG.base_path + url;
 /** 前端路由映射 */
 export default {
-    domain:{
+    company_admin:{
         area:{
-            to:domain_path('/area'),
+            to:resolvePath('/area'),
             icon:'area-chart',
             key:1,
             label:'区域监控',
         },
         warehouse:{
-            to:domain_path('/warehouse'),
+            to:resolvePath('/warehouse'),
             icon:'inbox',
             key:2,
             label:'仓储管理',
         },
-        warnsetting:{
-            to:domain_path('/warnsetting'),
+        warn:{
+            to:resolvePath('/warn'),
             icon:'warning',
             key:3,
             label:'预警配置',
         },
         user:{
-            to:domain_path('/userctrl'),
+            to:resolvePath('/userctrl'),
             icon:'inbox',
             key:4,
             label:'人员管理',
         },
         role:{
-            to:domain_path('/rolectrl'),
+            to:resolvePath('/rolectrl'),
             icon:'inbox',
             key:5,
             label:'角色管理',
         },
         msg:{
-            to:domain_path('/msg'),
+            to:resolvePath('/msg'),
             icon:'inbox',
             key:6,
             label:'数据阅览',
         }
     },
-    super_domain:{
+    common_user:{
+        area:{
+            to:resolvePath('/area'),
+            icon:'area-chart',
+            key:1,
+            label:'区域监控',
+        },
+        warehouse:{
+            to:resolvePath('/warehouse'),
+            icon:'inbox',
+            key:2,
+            label:'仓储管理',
+        },
+        warn:{
+            to:resolvePath('/warn'),
+            icon:'warning',
+            key:3,
+            label:'预警配置',
+        },
+        user:{
+            to:resolvePath('/userctrl'),
+            icon:'inbox',
+            key:4,
+            label:'人员管理',
+        },
+        role:{
+            to:resolvePath('/rolectrl'),
+            icon:'inbox',
+            key:5,
+            label:'角色管理',
+        },
+        msg:{
+            to:resolvePath('/msg'),
+            icon:'inbox',
+            key:6,
+            label:'数据阅览',
+        }
+    },
+    platform_admin:{
         company:{
-            to:super_domain_path('/company'),
+            to:resolvePath('/company'),
             icon:'inbox',
             key:3,
             label:'公司管理',
         },
         role:{
-            to:super_domain_path('/rolectrl'),
+            to:resolvePath('/rolectrl'),
             icon:'inbox',
             key:4,
             label:'角色管理',
         },
         power:{
-            to:super_domain_path('/powerctrl'),
+            to:resolvePath('/powerctrl'),
             icon:'inbox',
             key:1,
             label:'权限管理',
         },
         dir:{
-            to:super_domain_path('/dir'),
+            to:resolvePath('/dir'),
             icon:'inbox',
             key:2,
             label:'字典管理',

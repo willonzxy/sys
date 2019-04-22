@@ -18,7 +18,7 @@ import {
 import cors from 'koa2-cors'
 import fs from 'fs'
 import session from 'koa-session'
-let app = new Koa(),router = new Router(),{ user,msg,company,area,warehouse,warnsetting,dir,power,role} = Schema;
+let app = new Koa(),router = new Router(),{ user,msg,company,area,warehouse,warn,dir,power,role} = Schema;
 app.use(staticServer(path.resolve(__dirname,'./public')))
 //app.use(cors())
 app.keys = ['some secret hurr'];
@@ -65,7 +65,7 @@ app.use(koaBody({
             CompanyService = Service(ndbc,'company',company),
             AreaService = Service(ndbc,'area',area),
             WarehouseService = Service(ndbc,'warehouse',warehouse),
-            WarnConfigService = Service(ndbc,'warnsetting',warnsetting),
+            WarnConfigService = Service(ndbc,'warn',warn),
             PowerCtrlService = Service(ndbc,'power',power),
             RoleCtrlService = Service(ndbc,'role',role),
             DirService = Service(ndbc,'dir',dir);
@@ -89,7 +89,7 @@ app.use(koaBody({
             /** 公司 */
             router.get('/company',CompanyService.select)
                   .post('/company',companyRegister,CompanyService.created)
-                  .post('/company/login',checkLogin)
+                  //.post('/company/login',checkLogin)
                   .put('/company/:id',CompanyService.put)
                   .patch('/company/:id',CompanyService.patch)
                   .del('/company/:id',CompanyService.del)
@@ -124,6 +124,7 @@ app.use(koaBody({
                   .del('/user/:id',UserService.del)
                   .patch('/user/:id',UserService.patch)
                   .put('/user/:id',UserService.put)
+                  .post('/user/login',checkLogin)
 
             /** 权限管理 */
             router.get('/power',PowerCtrlService.select)
@@ -142,7 +143,7 @@ app.use(koaBody({
             router.get('/ownmenu',getMenu)
 
             router.get('/session',async ctx=>{
-                  if(ctx.session){
+                  if(ctx.session.loginStatus){
                         ctx.body = {status:1,session:ctx.session,msg:'login'}
                   }else{
                         ctx.body = {status:2,msg:'no login'}

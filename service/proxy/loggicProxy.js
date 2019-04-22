@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-20 10:11:44 
  * @Last Modified by: 伟龙
- * @Last Modified time: 2019-04-18 18:58:29
+ * @Last Modified time: 2019-04-23 01:54:24
  */
 import Schema from '../../model/schema.js'
 import Config from '../../config/config.json'
@@ -79,41 +79,58 @@ const areaCreateProxy = async function(ctx,next){
     await next()
 }
 
+/**  
+ * 1 登录认证
+ * 2 找出这个用户角色
+ * 
+*/
 const checkLogin =  async (ctx,next)=>{
-    let which = ctx.request.body.domain;
-    if(which){
-        delete ctx.request.body.domain
-        let data = await ctx.service.company._findOne(ctx.request.body)
-        if(data){
-            ctx.session.loginStatus = true;
-            ctx.session.tel = data.tel;
-            if(data.tel === super_domain_tel){
-                ctx.session.role = 'super_domain';
-                ctx.session.user = data;
-                return ctx.body = {status:1,msg:'success',super_domain:true}
-            }else{
-                ctx.session.role = 'domain';
-                ctx.session.user = data;
-                ctx.body = {status:1,msg:'success'}
-            }
-        }else{
-            ctx.session.loginStatus = false
-            ctx.body = {status:2,msg:'error'}
-        }
-    }else{ // 由公司管理员 添加的工作人员进入了工作系统
-        delete ctx.request.body.domain
-        let data = await ctx.service.user._findOne(ctx.request.body)
-        if(data){
-            ctx.session.loginStatus = true;
-            ctx.session.tel = data.tel;
-            ctx.session.role = 'common';
-            ctx.session.user = data
-            ctx.body = {status:1,msg:'success'}
-        }else{
-            ctx.session.loginStatus = false
-            ctx.body = {status:2,msg:'error'}
-        }
+    let {tel,password} = ctx.request.body;
+    let data = await ctx.service.user._findOne({tel,password})
+    if(data){
+        ctx.session.loginStatus = true;
+        //ctx.session.tel = data.tel;
+        ctx.session.role = data.user_role_name;
+        data.password && delete data.password;
+        ctx.session.user = data;
+        return ctx.body = {status:1,msg:'login success',user_role_name:data.user_role_name}
+    }else{
+        ctx.session.loginStatus = false
+        ctx.body = {status:2,msg:'error'}
     }
+// if(which){
+    //     delete ctx.request.body.domain
+    //     let data = await ctx.service.company._findOne(ctx.request.body)
+    //     if(data){
+    //         ctx.session.loginStatus = true;
+    //         ctx.session.tel = data.tel;
+    //         if(data.tel === super_domain_tel){
+    //             ctx.session.role = 'super_domain';
+    //             ctx.session.user = data;
+    //             return ctx.body = {status:1,msg:'success',super_domain:true}
+    //         }else{
+    //             ctx.session.role = 'domain';
+    //             ctx.session.user = data;
+    //             ctx.body = {status:1,msg:'success'}
+    //         }
+    //     }else{
+    //         ctx.session.loginStatus = false
+    //         ctx.body = {status:2,msg:'error'}
+    //     }
+    // }else{ // 由公司管理员 添加的工作人员进入了工作系统
+    //     delete ctx.request.body.domain
+    //     let data = await ctx.service.user._findOne(ctx.request.body)
+    //     if(data){
+    //         ctx.session.loginStatus = true;
+    //         ctx.session.tel = data.tel;
+    //         ctx.session.role = 'common';
+    //         ctx.session.user = data
+    //         ctx.body = {status:1,msg:'success'}
+    //     }else{
+    //         ctx.session.loginStatus = false
+    //         ctx.body = {status:2,msg:'error'}
+    //     }
+    // }
     
     await next()
 }
@@ -121,6 +138,7 @@ const checkLogin =  async (ctx,next)=>{
 const tableDataSet = async (ctx,next) =>{
     let keys = await ctx.service.dir.list({p_id:'C',pageSize:10000});
     let arr = [];
+   // console.log(keys)
     keys.list && keys.list.forEach(item=>{
         let ks = Object.keys(Schema[item.d_id]),temp = [],allValue = [];
             ks.forEach((ele,index)=>{ // 集合字段
@@ -149,22 +167,27 @@ const tableDataSet = async (ctx,next) =>{
 const getMenu = async (ctx,next)=>{
     try {
         // 从session 获取 role
-        const role = ctx.session.role || 'domain'
+        const role = ctx.session.role || 'common_user';
+        console.log('--------=============--------')
+        console.log(role)
         // 加载原始菜单
         //console.log(role)
-        role === 'common' && ( role = 'domain' );
+        //role === 'common' && ( role = 'domain' );
         const allMenu = MenuMap[role]; // 默认全部输出再过滤
+        //console.log(allMenu)
         //delete allMenu.msg // 测试删除数据阅览功能
         // 获取当前目录集合权限 ，过滤出菜单栏
         const ownMenu = Object.keys(allMenu) // 默认 , 应从power_id > power >collection_name
         let power_list = [],table_data_list = [];
         let powers = [],collections = [],data = {};
-        if(role === 'domain'){
-            let company_role = ctx.session.user.company_role; // array 包含role_id
+        if(role === 'company_domain'){
+            let company_id = ctx.user.session.user.user_company_id;
+            let companys = await ctx.service.company.list({_id:company_id}); // array 包含role_id
+            let company_role = companys.list[0].company_role_list;
             for(let len = company_role.length; len-- ;){
                 let temp = await ctx.service.role.list({
                     _id:company_role[len],
-                    role_scene:'super_domain'
+                    role_scene:role
                 })
                 if(!temp.list.length){
                     continue
@@ -203,11 +226,11 @@ const getMenu = async (ctx,next)=>{
                 collections:data,
                 table_data_list
             }
-        }else if(role === 'common'){
-            let role = ctx.session.user.role; // array 包含role_id
-            for(let len = role.length; len-- ;){
+        }else if(role === 'common_user'){
+            let u_role_list = ctx.session.user.role_list; // array 包含role_id
+            for(let len = u_role_list.length; len-- ;){
                 let temp = await ctx.service.role.list({
-                    _id:role[len],
+                    _id:u_role_list[len],
                     role_scene:'domain'
                 })
                 if(!temp.list.length){
