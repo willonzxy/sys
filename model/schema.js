@@ -1,8 +1,8 @@
 /*
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
- * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2019-04-18 00:59:13
+ * @Last Modified by: 伟龙
+ * @Last Modified time: 2019-04-22 17:25:18
  */
 export default {
     area:{
@@ -18,16 +18,16 @@ export default {
     },
     company:{
         company_name:{type:String,default:'未填写',required:true},
-        leader:{type:String,default:'未填写',required:true},
+        company_leader:{type:String,default:'未填写',required:true},
         licence:{type:String,required:true},
-        password:{type:String,required:true},
+        //password:{type:String,required:true},
         site:{type:String,required:true}, // 公司的位置
-        tel:{type:String,required:true}, // 公司负责人电话
+        company_tel:{type:String,required:true}, // 公司负责人电话
         companyinfo_created_date:{type:Number,required:true}, // 创建监控申请的时间
-        deadline:{type:Number}, // 平台使用截止日期
+        //deadline:{type:Number}, // 平台使用截止日期
         company_status:{type:Number,default:0}, // active ，平台使用已过有效期timeout
-        power_list:{type:Array,default:[]}, // [power_id}]
-        table_data_list:{type:Array,default:[]},// [{colletion_id
+        //power_list:{type:Array,default:[]}, // [power_id}]
+        //table_data_list:{type:Array,default:[]},// [{colletion_id
         company_role:{type:Array,default:[]} // 可以有承担多个角色
     },
     msg:{
@@ -65,6 +65,11 @@ export default {
         warnhouse_pic:{type:String}, // 传感器图片
         params:{type:Array,default:[]} // [{name:'',unit:'°C'}] 参数的单位与名称
     },
+    dev:{
+        area_id:{type:String,required:true},
+        dev_name:{type:String,required:true},
+        dev_desc:{type:String}
+    },
     dir:{  // 数据字典
         p_id:{type:String,required:true}, // 父级id
         p_name:{type:String,required:true},
@@ -90,10 +95,11 @@ export default {
         password:{type:String,required:true,default:'123456'},
         avatar:{type:String},
         user_desc:{type:String},
+        real_name:{type:String}, // 真实姓名
         user_status:{type:Number,required:true,default:0}, // 公司审核状态,是否确认
-        role_id:{type:String,required:true,default:''}, // 角色id
-        user_role_name:{type:String,required:true},
-        role:{type:Array,default:[]} // 管理员标识
+        role_id:{type:String,required:true,default:''}, // 角色id，没什么用
+        user_role_name:{type:String,required:true}, // 平台角色
+        role:{type:Array,default:[]} // 角色ID列表
     },
     role:{
         role_name:{type:String,required:true},
