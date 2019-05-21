@@ -2,7 +2,7 @@
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-02-27 20:18:21 
  * @Last Modified by: 伟龙
- * @Last Modified time: 2019-04-22 21:18:56
+ * @Last Modified time: 2019-05-11 18:19:09
  */
 export default {
     company:{ // updated
@@ -22,17 +22,18 @@ export default {
     },
     user:{
         user_company_id:{type:String,required:true},
+        user_company_name:{type:String},
         user_name:{type:String},
         tel:{type:String,required:true},
         email:{type:String,required:true},
-        password:{type:String,required:true},
+        password:{type:String,required:true,default:'e10adc3949ba59abbe56e057f20f883e'}, // 默认密码123456
         avatar:{type:String},
         real_name:{type:String},
         user_status:{type:Number,required:true,default:0}, // 公司审核状态,是否确认
         user_desc:{type:String},
         user_role_name:{type:String,required:true}, // 平台角色
         role_list:{type:Array}, // 角色列表
-        user_identity:{type:String,required:true}
+        user_identity:{type:String}
     },
     power:{
         power_name:{type:String,required:true},
@@ -43,32 +44,24 @@ export default {
         power_desc:{type:String},
         power_created_date:{type:String,default:Date.now()}
     },
-    // _id
-    // area_id
-    // area_name
-    // dev_id
-    // warn_dir_id
-    // warn_dir_name
-    // toEmail
-    // min_val
-    // max_val
-    // msg
-    // receive
     warn:{
-        area_id:{type:String,required:true}, // 指标预警字典值
-        area_name:{type:String,required:true}, // 选取指标名称后
-        dev_id:{type:String,required:true},
-        warn_dir_id:{type:String,required:true},
+        warn_company_id:{type:String,required:true},
+        warn_area_id:{type:String,required:true}, // 指标预警字典值
+        warn_area_name:{type:String,required:true}, // 选取指标名称后
+        warn_dev_id:{type:String,required:true},
+        warn_dev_name:{type:String,required:true},
+        warn_d_id:{type:String,required:true},
         warn_dir_name:{type:String,required:true},
         msg:{type:String,default:'注意! 该指标已达到预警值'},
         warn_status:{type:String}, // 默认关闭该预警
         warn_created_date:{type:String},
         warn_modifier:{type:String},
         warn_modified_date:{type:Number},
-        toEmail:{type:String},
-        min_val:{type:String},
-        max_val:{type:String},
-        receive:{type:String,required:true}, // 接收人
+        min_val:{type:Number},
+        max_val:{type:Number},
+        receive:{type:Array,required:true}, // 接收人组
+        receive_name_list:{type:Array,required:true},
+        unit:{type:String}
     },
 //     _id
 // role_name
@@ -88,37 +81,27 @@ export default {
     area:{
         area_company_id:{type:String,default:'未填写'}, //公司id 必填
         area_name:{type:String,default:'未填写',required:true},
-        sensor_list:{type:Array,default:[]}, //4-7拟定只有sensor_name 该区域下传感器的类型 [{type:'name',dev_list:[{did:'',status:'active'}},{did:'',status:''}]}]
-        // subnet_ip:{type:String,required:true}, // 一个区域子网ip,对应一个上报终端设备
         area_desc:{type:String},
         area_pic:{type:String},
         area_created_date:{type:Number,default:Date.now()},  // 必填
         area_modified_date:{type:Number,default:Date.now()},
         area_modifier:{type:String}, // 必填
     },
+    dev:{
+        dev_company_id:{type:String,required:true},
+        dev_id:{type:String,required:true},
+        dev_area_id:{type:String,required:true},
+        dev_area_name:{type:String},
+        dev_name:{type:String,required:true},
+        dev_desc:{type:String}
+    },
     msg:{
-        msg_company_id:{type:String,required:true},
-        area_id:{type:String,required:true},
-        ts:{type:Number,required:true},
-        params:{type:Array,required:true,default:[]},
-        /*
-        params的示例
-        var params = {
-            name1:{
-                data:'', // 融合后
-                dev_list:[ // 昧融合前
-                    {did:'',data:''}, // did为设备id
-                    {did:'',data:''},
-                ]
-            },
-            name2:{
-                data:'', // 融合后
-                dev_list:[ // 昧融合前
-                    {did:'',data:''},
-                    {did:'',data:''},
-                ]
-            },
-        }*/
+        msg_dir_id:{type:String,required:true},
+        msg_dir_name:{type:String,required:true},
+        msg_value:{type:Number,required:true},
+        msg_date:{type:Number},
+        msg_dev_id:{type:String,required:true},
+        msg_unit:{type:String},
     },
     warehouse:{
         warehouse_company_id:{type:String,required:true,default:'未填写'},
@@ -131,11 +114,7 @@ export default {
         warnhouse_pic:{type:String}, // 传感器图片
         params:{type:Array,default:[]} // [{name:'',unit:'°C'}] 参数的单位与名称
     },
-    dev:{
-        area_id:{type:String,required:true},
-        dev_name:{type:String,required:true},
-        dev_desc:{type:String}
-    },
+    
     dir:{  // 数据字典
         p_id:{type:String,required:true}, // 父级id
         p_name:{type:String,required:true},

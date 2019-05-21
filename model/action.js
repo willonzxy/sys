@@ -1,8 +1,8 @@
 /*
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-11 16:23:45 
- * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2019-04-17 11:42:57
+ * @Last Modified by: 伟龙
+ * @Last Modified time: 2019-05-11 11:33:22
  */
 import Mongoose from "mongoose"
 /* import dbConnect from "../db/connect.js" */
@@ -57,7 +57,7 @@ export default function (db,name,scheme){
          * 分页请求获取消息信息
          * @param {obj} query 
          */
-        list(query = {},options){                //返回一个Promise 对象
+        list(query = {},options={password:0}){                //返回一个Promise 对象
             query.pageNum = query.pageNum?~~query.pageNum-1:0;
             query.pageSize = query.pageSize?~~query.pageSize:5;
             query.sortBy = query.sortBy?query.sortBy:'date';
@@ -69,11 +69,12 @@ export default function (db,name,scheme){
                 if(k == 'pageNum' || k == 'pageSize' || k == 'sortBy' || k == 'sortWay' || k == 'filter' || k == 'regExp'){
                     continue
                 }
-                query.filter[k] = query.regExp.includes(k) ? new RegExp(query[k]) : query[k];
-               
+                query.filter[k] = query.regExp.includes(k) ? new RegExp(query[k]) : query[k];  
             }
             let that = this;
             let f = new Promise((resolve,reject)=>{
+                query.filter.msg_date && ( query.filter.msg_date = JSON.parse(query.filter.msg_date) )
+                // console.log(query.filter)
                 that.model(modelName).find(query.filter,options).skip(query.pageNum*query.pageSize).limit(query.pageSize).sort({_id:query.sortWay}).exec((err,result)=>{
                     if(err){
                         console.log(err);

@@ -9,12 +9,18 @@ export default {
             key:1,
             label:'区域监控',
         },
-        warehouse:{
-            to:resolvePath('/warehouse'),
+        dev:{
+            to:resolvePath('/dev'),
             icon:'inbox',
             key:2,
-            label:'仓储管理',
+            label:'设备管理',
         },
+        // warehouse:{
+        //     to:resolvePath('/warehouse'),
+        //     icon:'inbox',
+        //     key:2,
+        //     label:'仓储管理',
+        // },
         warn:{
             to:resolvePath('/warn'),
             icon:'warning',
@@ -47,12 +53,6 @@ export default {
             key:1,
             label:'区域监控',
         },
-        warehouse:{
-            to:resolvePath('/warehouse'),
-            icon:'inbox',
-            key:2,
-            label:'仓储管理',
-        },
         warn:{
             to:resolvePath('/warn'),
             icon:'warning',
@@ -84,6 +84,12 @@ export default {
             icon:'inbox',
             key:3,
             label:'公司管理',
+        },
+        user:{
+            to:resolvePath('/userctrl'),
+            icon:'inbox',
+            key:5,
+            label:'人员管理',
         },
         role:{
             to:resolvePath('/rolectrl'),

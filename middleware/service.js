@@ -34,7 +34,6 @@ let extendAction = {
         await this.add(ctx.request.body)
             .then(() => ctx.body = {status:1,msg:'success'} )
             .catch(err => ctx.body = {status:2,msg:err})
-        
     },
     async del(ctx,next){
         await this.removeById(ctx.params.id)
@@ -72,8 +71,21 @@ let extendAction = {
         if(!Object.keys(query).length){ // 取保password这个字段不对外吐出
             ctx.body = {status:2,msg:'query must required'}
         }
-        await this.list(query,{password:false})
-        .then(data => ctx.body = {status:1,msg:'success',data})
+        let special = ctx.query.special || {};
+        await this.list(query,{password:false,...special})
+        .then(data => {
+            if(query.p_id === 'R'){
+                let now_user_role_name = ctx.session.user.user_role_name;
+                if(now_user_role_name === 'platform_admin'){
+                    data.list = data.list.filter(item=>item.d_id !== 'common_user')
+                }else if(now_user_role_name === 'company_admin'){
+                    data.list = data.list.filter(item=>item.d_id !== 'platform_admin')
+                }else{
+                    data.list = [];
+                }
+            }
+            ctx.body = {status:1,msg:'success',data}
+        })
         .catch(err => ctx.body = {status:2,msg:err})
     }
 }
