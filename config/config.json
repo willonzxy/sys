@@ -3,5 +3,12 @@
         "mongodb":{
             "url":"mongodb://localhost:27017/sys"
         }
+    },
+    "filterAttr":["password"],
+    "domain_path":"/domain",
+    "super_domain_path":"/superdomain",
+    "base_path":"/platform",
+    "platform_role":{
+
     }
 }

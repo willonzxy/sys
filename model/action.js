@@ -1,8 +1,8 @@
 /*
  * @Author: 伟龙-Willon qq:1061258787 
  * @Date: 2019-03-11 16:23:45 
- * @Last Modified by: 伟龙-Willon
- * @Last Modified time: 2019-03-13 18:49:34
+ * @Last Modified by: 伟龙
+ * @Last Modified time: 2019-05-11 11:33:22
  */
 import Mongoose from "mongoose"
 /* import dbConnect from "../db/connect.js" */
@@ -21,7 +21,7 @@ export default function (db,name,scheme){
         removeById(id){
             let _id = Mongoose.Types.ObjectId(id),that = this;
             return new Promise((resolve,reject)=>{
-                that.model(modelName).remove({_id},(err)=>{
+                that.model(modelName).deleteOne({_id},(err)=>{
                     if(err){
                         reject(err);
                     }else{
@@ -39,6 +39,7 @@ export default function (db,name,scheme){
          * @param {obj} options 
          */
         updateInfo(condition,update,options={multi:true}){
+            condition._id && (condition._id = Mongoose.Types.ObjectId(condition._id))
             let that = this;
             return new Promise((resolve,reject)=>{
                 that.model(modelName).updateOne(condition,update,options,(err)=>{
@@ -56,21 +57,25 @@ export default function (db,name,scheme){
          * 分页请求获取消息信息
          * @param {obj} query 
          */
-        list(query = {}){                //返回一个Promise 对象
+        list(query = {},options={password:0}){                //返回一个Promise 对象
             query.pageNum = query.pageNum?~~query.pageNum-1:0;
-            query.pageSize = query.pageSize?~~query.pageSize:10;
+            query.pageSize = query.pageSize?~~query.pageSize:5;
             query.sortBy = query.sortBy?query.sortBy:'date';
             query.sortWay = query.sortWay?query.sortWay:-1;//默认降序
+            query.regExp || (query.regExp = []); //以正则形式匹配某些字段 
             query.filter = {};
+            query._id && (query.filter._id = Mongoose.Types.ObjectId(query._id))
             for(let k in query){
-                if(k == 'pageNum' || k == 'pageSize' || k == 'sortBy' || k == 'sortWay' || k == 'filter' ){
+                if(k == 'pageNum' || k == 'pageSize' || k == 'sortBy' || k == 'sortWay' || k == 'filter' || k == 'regExp'){
                     continue
                 }
-                query.filter[k] = query[k];
+                query.filter[k] = query.regExp.includes(k) ? new RegExp(query[k]) : query[k];  
             }
             let that = this;
             let f = new Promise((resolve,reject)=>{
-                that.model(modelName).find(query.filter).skip(query.pageNum*query.pageSize).limit(query.pageSize).sort({_id:query.sortWay}).exec((err,result)=>{
+                query.filter.msg_date && ( query.filter.msg_date = JSON.parse(query.filter.msg_date) )
+                // console.log(query.filter)
+                that.model(modelName).find(query.filter,options).skip(query.pageNum*query.pageSize).limit(query.pageSize).sort({_id:query.sortWay}).exec((err,result)=>{
                     if(err){
                         console.log(err);
                         reject('获取当前页数据失败');
@@ -86,7 +91,7 @@ export default function (db,name,scheme){
                             reject('获取数据总数失败');
                         }else{
                             let total = num>0 ? ~~((num-1) / query.pageSize)+1 : 0;
-                            resolve({list:result,numTotal:num,pageTotal:total});
+                            resolve({list:result,numTotal:num,pageTotal:total,count:result.length,currentPage:query.pageNum+1,pageSize:query.pageSize});
                         }
                     })
                 }),
@@ -99,8 +104,6 @@ export default function (db,name,scheme){
          * @param {obj} obj 
          */
         add(obj){
-            console.log('adasdasdnnnn')
-            console.log(obj)
             let that = this;
             return new Promise((resolve,reject)=>{
                 that.model(modelName).create(obj,err=>{
@@ -109,6 +112,20 @@ export default function (db,name,scheme){
                         reject({status:2,msg:'保存信息失败'});
                     }else{
                         resolve();
+                    }
+                })
+            })
+        },
+        _findOne(obj){
+            let that = this;
+            return new Promise((resolve,reject)=>{
+                that.model(modelName).findOne(obj,(err,data)=>{
+                    if(err){
+                        reject({status:2,msg:'不存在该信息'});
+                    }else if(!data){
+                        resolve()
+                    }else{
+                        resolve(data)
                     }
                 })
             })
